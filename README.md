@@ -5,7 +5,8 @@ This repository contains a collection of Data Structures and Algorithms projects
 ## Course information
 
 The DSA BSU course covers fundamental computer science concepts of code efficiency and time/memory optimization involving various algorithm techniques and data structures. The projects in this repository provide solutions to general course problems, as well as individual tasks.
-Note: code may sometimes be in a non-optimal configuration for readability to meet certain automatic testing requirements!
+
+*Note: code may sometimes be in a non-optimal configuration for readability to meet certain automatic testing requirements!*
 
 ## Tech Stack
 
