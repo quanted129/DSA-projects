@@ -3,23 +3,24 @@ using namespace std;
 
 struct element
 {
-    int data;
+    long long data;
     int prevIndex;
     bool isR;
-    int min;
-    int max;
+    long long min;
+    long long max;
 };
 
 int main()
 {
     ifstream in("bst.in");
     ofstream out("bst.out");
-    int n, m, p;
+    int n, p;
+    long long m;
     char c;
     in >> n >> m;
     auto* arr = new element[n + 1];
     arr[0] = element{0, -1, 0, 0, 0};
-    arr[1] = element{m, 0, 0, -2147483648, 2147483647};
+    arr[1] = element{m, 0, 0, -9223372036854775808, 9223372036854775807};
     bool broken = 0;
     for (int i = 2; i < n + 1 && !broken; i++)
     {
