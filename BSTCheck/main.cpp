@@ -6,6 +6,8 @@ struct element
     int data;
     int prevIndex;
     bool isR;
+    int min;
+    int max;
 };
 
 int main()
@@ -16,20 +18,15 @@ int main()
     char c;
     in >> n >> m;
     auto* arr = new element[n + 1];
-    arr[0] = element{ 0, -1, 0 };
-    arr[1] = element{ m, 0, 0 };
+    arr[0] = element{0, -1, 0, 0, 0};
+    arr[1] = element{m, 0, 0, -2147483648, 2147483647};
     bool broken = 0;
-    for (int i = 2; i < n + 1; i++)
+    for (int i = 2; i < n + 1 && !broken; i++)
     {
         in >> m >> p >> c;
-        arr[i] = element{ m, p, c == 'R'};
-        int ind = i;
-        int value = arr[ind].data;
-        while (arr[ind].prevIndex != 0 && !broken)
-        {
-            if (!((arr[ind].isR && value >= arr[arr[ind].prevIndex].data) || (!arr[ind].isR && value < arr[arr[ind].prevIndex].data))) broken = 1;
-            ind = arr[ind].prevIndex;
-        }
+        if (c == 'R') arr[i] = element{m, p, 1, (arr[p].data > arr[p].min) ? arr[p].data : arr[p].min, arr[p].max};
+        else arr[i] = element{m, p, 0, arr[p].min, (arr[p].data - 1 > arr[p].max) ? arr[p].max : arr[p].data - 1};
+        if (arr[i].data < arr[i].min || arr[i].data > arr[i].max) broken = 1;
     }
     in.close();
     broken ? (out << "NO") : (out << "YES");
