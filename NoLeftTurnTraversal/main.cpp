@@ -13,15 +13,16 @@ struct Coords
 struct Pos
 {
     int node;
-    int state; //0 - up, 1 - right, 2 - down, 3 - left
+    int state; //index of prev crossroads
     bool operator==(const Pos& other) const { return (node == other.node) && (state == other.state); }
 };
 
 int main()
 {
     ifstream in("input.txt");
-    int n, m, x1, x2, y1, y2, n1, n2, start, finish, temp;
-    bool push = 1;
+    int n, m, x1, x2, y1, y2, n1, n2, start, finish;
+    long long inVector_x, inVector_y, outVector_x, outVector_y, crossProduct, dotProduct;
+    bool push;
     in >> n >> m;
     vector<Coords> crossroads(n + 1);
     vector<vector<bool>> adjMatrix(n + 1, vector<bool>(n + 1, 0));
@@ -44,72 +45,31 @@ int main()
         {
             if (adjMatrix[q.front().node][i])
             {
-                if (crossroads[q.front().node].x == crossroads[i].x && crossroads[q.front().node].y < crossroads[i].y)
+                if (q.front().state == 0)
                 {
-                    //MOVE UP
-                    if (q.front().state == 3 || q.front().state == 0)
-                    {
-                        for (int j = 0; j < path[i].size(); j++)
-                        {
-                            if (path[i][j] == q.front()) push = 0;
-                        }
-                        if (push)
-                        {
-                            q.push({i, 0});
-                            path[i].push_back(q.front());
-                        }
-                        push = 1;
-                    }
+                    inVector_x = 0;
+                    inVector_y = 1;
                 }
-                if (crossroads[q.front().node].x < crossroads[i].x && crossroads[q.front().node].y == crossroads[i].y)
+                else
                 {
-                    //MOVE RIGHT
-                    if (q.front().state == 0 || q.front().state == 1)
-                    {
-                        for (int j = 0; j < path[i].size(); j++)
-                        {
-                            if (path[i][j] == q.front()) push = 0;
-                        }
-                        if (push)
-                        {
-                            q.push({i, 1});
-                            path[i].push_back(q.front());
-                        }
-                        push = 1;
-                    }
+                    inVector_x = crossroads[q.front().node].x - crossroads[q.front().state].x;
+                    inVector_y = crossroads[q.front().node].y - crossroads[q.front().state].y;
                 }
-                if (crossroads[q.front().node].x == crossroads[i].x && crossroads[q.front().node].y > crossroads[i].y)
+                outVector_x = crossroads[i].x - crossroads[q.front().node].x;
+                outVector_y = crossroads[i].y - crossroads[q.front().node].y;
+                crossProduct = inVector_x * outVector_y - inVector_y * outVector_x;
+                dotProduct = inVector_x * outVector_x + inVector_y * outVector_y;
+                if ((crossProduct == 0 && dotProduct > 0) || crossProduct < 0)
                 {
-                    //MOVE DOWN
-                    if (q.front().state == 1 || q.front().state == 2)
+                    push = 1;
+                    for (int j = 0; j < path[i].size() && push; j++)
                     {
-                        for (int j = 0; j < path[i].size(); j++)
-                        {
-                            if (path[i][j] == q.front()) push = 0;
-                        }
-                        if (push)
-                        {
-                            q.push({i, 2});
-                            path[i].push_back(q.front());
-                        }
-                        push = 1;
+                        if (path[i][j].node == q.front().node) push = 0;
                     }
-                }
-                if (crossroads[q.front().node].x > crossroads[i].x && crossroads[q.front().node].y == crossroads[i].y)
-                {
-                    //MOVE LEFT
-                    if (q.front().state == 2 || q.front().state == 3)
+                    if (push)
                     {
-                        for (int j = 0; j < path[i].size(); j++)
-                        {
-                            if (path[i][j] == q.front()) push = 0;
-                        }
-                        if (push)
-                        {
-                            q.push({i, 3});
-                            path[i].push_back(q.front());
-                        }
-                        push = 1;
+                        q.push({i, q.front().node});
+                        path[i].push_back(q.front());
                     }
                 }
             }
@@ -120,14 +80,23 @@ int main()
     if (!q.empty())
     {
         stack<int> result;
-        result.push(finish);
         out << "Yes\n";
-        while (finish != start)
+        int current = q.front().state;
+        while (finish != 0)
         {
-            int resultNode = path[finish].back().node;
-            path[finish].pop_back();
-            result.push(resultNode);
-            finish = resultNode;
+            result.push(finish);
+            int resultNode = 0;
+            push = 1;
+            for (int i = 0; i < path[finish].size() && push; i++)
+            {
+                if (path[finish][i].node == current)
+                {
+                    resultNode = path[finish][i].state;
+                    push = 0;
+                }
+            }
+            finish = current;
+            current = resultNode;
         }
         while (!result.empty())
         {
